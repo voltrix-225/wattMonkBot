@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
 
 from rag_backend import load_and_index_documents, generate_rag_response
 
@@ -14,12 +15,16 @@ templates = Jinja2Templates(directory="templates")
 # Load retriever once at startup
 retriever_instance = None
 
-@app.on_event("startup")
-def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global retriever_instance
+    print("Loading documents and building retriever...")
     retriever_instance = load_and_index_documents()
-if retriever_instance is None:
-    raise RuntimeError("No documents indexed. Add PDFs to docs folder.")
+    yield
+    print("Shutting down application")
+
+app = FastAPI(lifespan=lifespan)
+
 
 
 chat_history = [
