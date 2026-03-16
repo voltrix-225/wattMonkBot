@@ -9,5 +9,6 @@ chromadb
 pymupdf
 fastapi
 requests
-gunicorn
+uvicorn
 google-genai
+jinja2
