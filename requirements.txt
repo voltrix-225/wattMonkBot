@@ -1,0 +1,13 @@
+python-dotenv
+sentence_transformers
+langchain
+langchain_huggingface
+langchain_community
+langchain_core
+langchain_text_splitter
+langchain_chroma
+chromadb
+pymupdf
+fastapi
+requests
+gunicorn
