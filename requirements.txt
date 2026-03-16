@@ -10,3 +10,4 @@ pymupdf
 fastapi
 requests
 gunicorn
+google-genai
