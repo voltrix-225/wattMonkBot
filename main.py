@@ -12,7 +12,12 @@ templates = Jinja2Templates(directory="templates")
 
 
 # Load retriever once at startup
-retriever_instance = load_and_index_documents()
+retriever_instance = None
+
+@app.on_event("startup")
+def startup_event():
+    global retriever_instance
+    retriever_instance = load_and_index_documents()
 if retriever_instance is None:
     raise RuntimeError("No documents indexed. Add PDFs to docs folder.")
 
@@ -61,7 +66,3 @@ async def ask(query_request: QueryRequest):
         "bot": response
     })
 
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
