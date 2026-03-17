@@ -49,7 +49,12 @@ async def index(request: Request):
 
 @app.post("/ask")
 async def ask(query_request: QueryRequest):
-    global chat_history
+    global chat_history, retriever_instance
+
+    # Lazy load here
+    if retriever_instance is None:
+        print("Loading RAG pipeline...")
+        retriever_instance = load_and_index_documents()
 
     query = query_request.query.strip()
 
@@ -71,3 +76,6 @@ async def ask(query_request: QueryRequest):
         "bot": response
     })
 
+@app.get("/")
+async def root():
+    return {"message": "App is running"}
