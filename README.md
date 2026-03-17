@@ -114,6 +114,7 @@ Response Displayed to User
 * HTML
 * Jinja Templates
 * JavaScript
+  
 FOR DEPLOYMENT TO HF SPACES, I UPDATED THE FRONTEND STACK TO:
 * Gradio
 ---
