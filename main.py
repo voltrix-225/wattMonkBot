@@ -1,70 +1,26 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, HTMLResponse
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
-
+import gradio as gr
 from rag_backend import load_and_index_documents, generate_rag_response
 
+retriever = None
 
-app = FastAPI()
+def chatbot(query, history):
+    global retriever
 
-templates = Jinja2Templates(directory="templates")
+    if retriever is None:
+        retriever = load_and_index_documents()
 
-retriever_instance = None
+    response = generate_rag_response(query, retriever)
+    history.append((query, response))
 
-chat_history = [
-    {"bot": "Hi, I'm your AI assistant."}
-]
-
-
-class QueryRequest(BaseModel):
-    query: str
+    return "", history
 
 
-# Root (for Render health check)
-@app.get("/")
-async def root():
-    return {"status": "running"}
+with gr.Blocks() as demo:
+    gr.Markdown("## 💬 RAG Chatbot (NEC + Wattmonk)")
 
+    chatbot_ui = gr.Chatbot()
+    msg = gr.Textbox(placeholder="Ask a question...")
+    
+    msg.submit(chatbot, [msg, chatbot_ui], [msg, chatbot_ui])
 
-#  UI route
-@app.get("/chat", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "chat_history": chat_history
-        }
-    )
-
-
-# RAG endpoint
-@app.post("/ask")
-async def ask(query_request: QueryRequest):
-    global chat_history, retriever_instance
-
-    query = query_request.query.strip()
-
-    if not query:
-        return JSONResponse({
-            "user": "",
-            "bot": "Please enter a question."
-        })
-
-    # Lazy load 
-    if retriever_instance is None:
-        print("Loading RAG pipeline...")
-        retriever_instance = load_and_index_documents()
-
-    response = generate_rag_response(query, retriever_instance)
-
-    chat_history.append({
-        "user": query,
-        "bot": response
-    })
-
-    return JSONResponse({
-        "user": query, 
-        "bot": response
-    })
+demo.launch()

@@ -1,12 +1,10 @@
-fastapi
-uvicorn
-jinja2
-python-dotenv
+gradios
 langchain
 langchain-community
 langchain-chroma
 langchain-huggingface
-sentence-transformers
 chromadb
+sentence-transformers==2.2.2
 pymupdf
+python-dotenv
 google-genai
